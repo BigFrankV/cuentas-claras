@@ -1,0 +1,49 @@
+.user-management-container {
+  padding: 20px;
+}
+
+.user-management-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.user-management-header h1 {
+  margin: 0;
+}
+
+/* Estilos para la tabla */
+.ant-table-wrapper {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+}
+
+/* Estilos para los botones de acción */
+.ant-btn-primary {
+  background-color: #1890ff;
+}
+
+.ant-btn-danger {
+  background-color: #ff4d4f;
+  border-color: #ff4d4f;
+}
+
+/* Estilos para los modales */
+.ant-modal-content {
+  border-radius: 8px;
+}
+
+.ant-modal-header {
+  border-radius: 8px 8px 0 0;
+}
+
+/* Estilos para los formularios */
+.ant-form-item-label > label {
+  font-weight: 500;
+}
+
+.ant-input, .ant-select-selector {
+  border-radius: 4px;
+}
