@@ -2,21 +2,17 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
 import esES from 'antd/lib/locale/es_ES';
-import './App.css';
-
-// Contexto de autenticación
 import { AuthProvider } from './context/AuthContext';
-
-// Componentes de autenticación
-import Login from './components/auth/Login';
 import ProtectedRoute from './components/auth/ProtectedRoute';
-
-// Componentes de administración y residentes
+import Login from './components/auth/Login';
 import AdminDashboard from './components/admin/AdminDashboard';
 import ResidentDashboard from './components/resident/ResidentDashboard';
-
-// Importa los componentes adicionales para residentes
 import ResidentMultas from './components/resident/ResidentMultas';
+import ResidentGastoComun from './components/resident/ResidentGastoComun';
+import ResidentProfile from './components/resident/ResidentProfile';
+import ResidentAyuda from './components/resident/ResidentAyuda';
+import ResidentResumen from './components/resident/ResidentResumen';
+import './App.css';
 
 function App() {
   return (
@@ -27,16 +23,7 @@ function App() {
             {/* Ruta pública - Login */}
             <Route path="/login" element={<Login />} />
             
-            {/* Rutas protegidas */}
-            <Route 
-              path="/admin" 
-              element={
-                <ProtectedRoute adminOnly={true}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            
+            {/* Rutas protegidas - Residente */}
             <Route 
               path="/resident" 
               element={
@@ -45,18 +32,65 @@ function App() {
                 </ProtectedRoute>
               } 
             />
-            
-            {/* Nuevas rutas para residentes */}
-            <Route
-              path="/resident/multas"
+            <Route 
+              path="/resident/gastocomun" 
+              element={
+                <ProtectedRoute>
+                  <ResidentGastoComun />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/resident/profile" 
+              element={
+                <ProtectedRoute>
+                  <ResidentProfile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/resident/multas" 
               element={
                 <ProtectedRoute>
                   <ResidentMultas />
                 </ProtectedRoute>
-              }
+              } 
+            />
+            <Route 
+              path="/resident/ayuda" 
+              element={
+                <ProtectedRoute>
+                  <ResidentAyuda />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/resident/resumen" 
+              element={
+                <ProtectedRoute>
+                  <ResidentResumen />
+                </ProtectedRoute>
+              } 
             />
             
-
+            {/* Rutas protegidas - Administrador */}
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/*" 
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            
             {/* Redirecciones */}
             <Route path="/" element={<Navigate to="/login" />} />
             <Route path="*" element={<Navigate to="/login" />} />

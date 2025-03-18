@@ -1,32 +1,100 @@
 .resident-multas-container {
-    padding: 24px;
-    background: #fff;
-    min-height: 280px;
+  padding: 24px;
+  background: #fff;
+  min-height: 280px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+}
+
+.multas-header {
+  margin-bottom: 24px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 0;
+}
+
+.loading-container .ant-spin {
+  margin-bottom: 16px;
+}
+
+.stats-row {
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-5px);
+}
+
+.multas-table {
+  margin-top: 16px;
+}
+
+.ant-table-thead > tr > th {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.ant-table-tbody > tr:hover {
+  background: #f5f5f5;
+}
+
+.ant-btn-primary {
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+.ant-btn-primary:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+.ant-tag-error {
+  color: #f5222d;
+  background: #fff1f0;
+  border-color: #ffa39e;
+}
+
+.ant-tag-success {
+  color: #52c41a;
+  background: #f6ffed;
+  border-color: #b7eb8f;
+}
+
+/* Media queries para responsividad */
+@media (max-width: 768px) {
+  .stats-row .ant-col {
+    margin-bottom: 16px;
   }
   
   .ant-table {
-    margin-top: 20px;
+    font-size: 14px;
   }
   
-  .ant-table-header {
-    background: #f0f2f5;
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    padding: 12px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .resident-multas-container {
+    padding: 16px;
   }
   
-  .ant-table-thead > tr > th {
-    background: #e6f7ff;
-    color: #1890ff;
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    padding: 8px 4px;
   }
-  
-  .ant-table-tbody > tr:hover {
-    background: #f5f5f5;
-  }
-  
-  .ant-btn-primary {
-    background-color: #1890ff;
-    border-color: #1890ff;
-  }
-  
-  .ant-btn-primary:hover {
-    background-color: #40a9ff;
-    border-color: #40a9ff;
-  }
+}

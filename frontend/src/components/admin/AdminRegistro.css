@@ -1,0 +1,36 @@
+.admin-registro-container {
+  padding: 20px;
+}
+
+.registro-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  padding: 16px;
+}
+
+.registro-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.registro-icon {
+  font-size: 32px;
+  margin-right: 16px;
+  color: #1890ff;
+}
+
+.registro-header h2 {
+  margin: 0;
+  color: #1890ff;
+}
+
+@media (max-width: 768px) {
+  .admin-registro-container {
+    padding: 16px;
+  }
+  
+  .registro-card {
+    padding: 12px;
+  }
+}

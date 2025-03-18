@@ -7,7 +7,7 @@ import {
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  WarningOutlined // Importar el ícono para multas
+  WarningOutlined 
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../../context/AuthContext';
@@ -93,13 +93,13 @@ const ResidentDashboard = () => {
             <Menu.Item key="1" icon={<HomeOutlined />} onClick={() => navigate('/resident')}>
               Dashboard
             </Menu.Item>
-            <Menu.Item key="2" icon={<DollarOutlined />} onClick={() => navigate('/resident')}>
-              Mis Pagos
+            <Menu.Item key="2" icon={<DollarOutlined />} onClick={() => navigate('/resident/gastocomun')}>
+              Gastos Comunes
             </Menu.Item>
             <Menu.Item key="3" icon={<WarningOutlined />} onClick={() => navigate('/resident/multas')}>
               Mis Multas
             </Menu.Item>
-            <Menu.Item key="4" icon={<UserOutlined />} onClick={() => navigate('/resident')}>
+            <Menu.Item key="4" icon={<UserOutlined />} onClick={() => navigate('/resident/profile')}>
               Mi Perfil
             </Menu.Item>
           </Menu>
@@ -118,9 +118,18 @@ const ResidentDashboard = () => {
               <div className="dashboard-card">
                 <DollarOutlined className="card-icon" />
                 <div className="card-content">
-                  <h3>Mis Pagos</h3>
+                  <h3>Gastos Comunes</h3>
                   <p>Consulta y realiza pagos de gastos comunes</p>
-                  <Button type="primary" onClick={() => navigate('/resident/fines')}>Ver Pagos</Button>
+                  <Button type="primary" onClick={() => navigate('/resident/gastocomun')}>Ver Gastos</Button>
+                </div>
+              </div>
+              
+              <div className="dashboard-card">
+                <WarningOutlined className="card-icon" />
+                <div className="card-content">
+                  <h3>Mis Multas</h3>
+                  <p>Revisa y paga tus multas pendientes</p>
+                  <Button type="primary" onClick={() => navigate('/resident/multas')}>Ver Multas</Button>
                 </div>
               </div>
               

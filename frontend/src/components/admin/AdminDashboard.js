@@ -6,12 +6,16 @@ import {
   DollarOutlined, 
   WarningOutlined, 
   LogoutOutlined,
-  UserAddOutlined,
   MenuFoldOutlined,
-  MenuUnfoldOutlined
+  MenuUnfoldOutlined,
+  BarChartOutlined,
+  TeamOutlined,
+  SettingOutlined
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Routes, Route } from 'react-router-dom';
 import AuthContext from '../../context/AuthContext';
+import Notificaciones from '../common/Notificaciones';
+import AdminEstadisticas from './AdminEstadisticas';
 import './AdminDashboard.css';
 
 const { Header, Content, Sider } = Layout;
@@ -20,6 +24,7 @@ const { Title } = Typography;
 const AdminDashboard = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileView, setMobileView] = useState(window.innerWidth < 768);
 
@@ -45,6 +50,18 @@ const AdminDashboard = () => {
     navigate('/login');
   };
 
+  // Determinar la ruta actual para seleccionar el menú correspondiente
+  const getSelectedKey = () => {
+    const path = location.pathname;
+    if (path === '/admin') return '1';
+    if (path === '/admin/estadisticas') return '2';
+    if (path === '/admin/gastocomun') return '3';
+    if (path === '/admin/multas') return '4';
+    if (path === '/admin/residentes') return '5';
+    if (path === '/admin/configuracion') return '6';
+    return '1';
+  };
+
   return (
     <Layout className="admin-layout">
       <Header className="admin-header">
@@ -63,8 +80,9 @@ const AdminDashboard = () => {
           </div>
         </div>
         <div className="header-right">
+          <Notificaciones />
           <span className="welcome-text">
-            Bienvenido, {user?.first_name} {user?.last_name}
+            Administrador: {user?.first_name} {user?.last_name}
           </span>
           <Button 
             type="text" 
@@ -88,20 +106,26 @@ const AdminDashboard = () => {
         >
           <Menu
             mode="inline"
-            defaultSelectedKeys={['1']}
+            defaultSelectedKeys={[getSelectedKey()]}
             style={{ height: '100%', borderRight: 0 }}
           >
-            <Menu.Item key="1" icon={<HomeOutlined />}>
+            <Menu.Item key="1" icon={<HomeOutlined />} onClick={() => navigate('/admin')}>
               Dashboard
             </Menu.Item>
-            <Menu.Item key="2" icon={<UserOutlined />}>
-              Usuarios
+            <Menu.Item key="2" icon={<BarChartOutlined />} onClick={() => navigate('/admin/estadisticas')}>
+              Estadísticas
             </Menu.Item>
-            <Menu.Item key="3" icon={<DollarOutlined />}>
+            <Menu.Item key="3" icon={<DollarOutlined />} onClick={() => navigate('/admin/gastocomun')}>
               Gastos Comunes
             </Menu.Item>
-            <Menu.Item key="4" icon={<WarningOutlined />}>
+            <Menu.Item key="4" icon={<WarningOutlined />} onClick={() => navigate('/admin/multas')}>
               Multas
+            </Menu.Item>
+            <Menu.Item key="5" icon={<TeamOutlined />} onClick={() => navigate('/admin/residentes')}>
+              Residentes
+            </Menu.Item>
+            <Menu.Item key="6" icon={<SettingOutlined />} onClick={() => navigate('/admin/configuracion')}>
+              Configuración
             </Menu.Item>
           </Menu>
         </Sider>
@@ -114,44 +138,61 @@ const AdminDashboard = () => {
               minHeight: 280,
             }}
           >
-            <Title level={2}>Panel de Administración</Title>
-            <div className="dashboard-cards">
-              <div className="dashboard-card">
-                <UserOutlined className="card-icon" />
-                <div className="card-content">
-                  <h3>Usuarios</h3>
-                  <p>Gestiona los residentes y administradores</p>
-                  <Button type="primary">Ver Usuarios</Button>
-                </div>
-              </div>
-              
-              <div className="dashboard-card">
-                <UserAddOutlined className="card-icon" />
-                <div className="card-content">
-                  <h3>Registrar Usuario</h3>
-                  <p>Añade nuevos residentes o administradores</p>
-                  <Button type="primary">Registrar</Button>
-                </div>
-              </div>
-              
-              <div className="dashboard-card">
-                <DollarOutlined className="card-icon" />
-                <div className="card-content">
-                  <h3>Gastos Comunes</h3>
-                  <p>Administra los gastos del edificio</p>
-                  <Button type="primary">Ver Gastos</Button>
-                </div>
-              </div>
-              
-              <div className="dashboard-card">
-                <WarningOutlined className="card-icon" />
-                <div className="card-content">
-                  <h3>Multas</h3>
-                  <p>Gestiona las multas de los residentes</p>
-                  <Button type="primary">Ver Multas</Button>
-                </div>
-              </div>
-            </div>
+            <Routes>
+              <Route path="/" element={
+                <>
+                  <Title level={2}>Panel de Administración</Title>
+                  <div className="dashboard-cards">
+                    <div className="dashboard-card">
+                      <BarChartOutlined className="card-icon" />
+                      <div className="card-content">
+                        <h3>Estadísticas</h3>
+                        <p>Visualiza estadísticas de gastos comunes y multas</p>
+                        <Button type="primary" onClick={() => navigate('/admin/estadisticas')}>Ver Estadísticas</Button>
+                      </div>
+                    </div>
+                    
+                    <div className="dashboard-card">
+                      <DollarOutlined className="card-icon" />
+                      <div className="card-content">
+                        <h3>Gastos Comunes</h3>
+                        <p>Administra los gastos comunes de los residentes</p>
+                        <Button type="primary" onClick={() => navigate('/admin/gastocomun')}>Administrar</Button>
+                      </div>
+                    </div>
+                    
+                    <div className="dashboard-card">
+                      <WarningOutlined className="card-icon" />
+                      <div className="card-content">
+                        <h3>Multas</h3>
+                        <p>Gestiona las multas de los residentes</p>
+                        <Button type="primary" onClick={() => navigate('/admin/multas')}>Administrar</Button>
+                      </div>
+                    </div>
+                    
+                    <div className="dashboard-card">
+                      <TeamOutlined className="card-icon" />
+                      <div className="card-content">
+                        <h3>Residentes</h3>
+                        <p>Administra los usuarios residentes</p>
+                        <Button type="primary" onClick={() => navigate('/admin/residentes')}>Administrar</Button>
+                      </div>
+                    </div>
+                    
+                    <div className="dashboard-card">
+                      <SettingOutlined className="card-icon" />
+                      <div className="card-content">
+                        <h3>Configuración</h3>
+                        <p>Configura los parámetros del sistema</p>
+                        <Button type="primary" onClick={() => navigate('/admin/configuracion')}>Configurar</Button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              } />
+              <Route path="/estadisticas" element={<AdminEstadisticas />} />
+              {/* Aquí se pueden agregar más rutas para otros componentes de administrador */}
+            </Routes>
           </Content>
         </Layout>
       </Layout>

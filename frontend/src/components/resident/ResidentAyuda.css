@@ -1,0 +1,71 @@
+.ayuda-container {
+  padding: 20px;
+}
+
+.ayuda-section {
+  margin-bottom: 32px;
+}
+
+.faq-collapse {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+}
+
+.faq-panel {
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.ant-collapse-header {
+  font-weight: 500;
+}
+
+.contacto-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.contacto-card {
+  flex: 1;
+  min-width: 250px;
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  padding: 24px;
+  transition: all 0.3s;
+}
+
+.contacto-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.contacto-icon {
+  font-size: 32px;
+  color: #1890ff;
+  margin-bottom: 16px;
+}
+
+.horario {
+  color: #8c8c8c;
+  font-size: 14px;
+}
+
+.soporte-card {
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  padding: 24px;
+}
+
+.soporte-button {
+  margin-top: 16px;
+}
+
+@media (max-width: 768px) {
+  .contacto-card {
+    flex: 100%;
+  }
+}
