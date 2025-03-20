@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Layout, Menu, Typography, Button } from 'antd';
 import { 
-  UserOutlined, 
   HomeOutlined, 
   DollarOutlined, 
   WarningOutlined, 

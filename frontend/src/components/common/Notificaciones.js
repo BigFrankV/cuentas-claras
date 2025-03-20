@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Badge, Dropdown, List, Typography, Button, notification, Spin, Empty } from 'antd';
 import { BellOutlined, CheckOutlined, DeleteOutlined } from '@ant-design/icons';
-import axios from 'axios';
 import AuthContext from '../../context/AuthContext';
 import './Notificaciones.css';
 
 const { Text } = Typography;
 
 const Notificaciones = () => {
-  const { user } = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
   const [notificaciones, setNotificaciones] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
