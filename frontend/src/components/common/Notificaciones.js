@@ -1,13 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Badge, Dropdown, List, Typography, Button, notification, Spin, Empty } from 'antd';
 import { BellOutlined, CheckOutlined, DeleteOutlined } from '@ant-design/icons';
-import AuthContext from '../../context/AuthContext';
 import './Notificaciones.css';
 
 const { Text } = Typography;
 
 const Notificaciones = () => {
-  const authContext = useContext(AuthContext);
   const [notificaciones, setNotificaciones] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -49,7 +47,7 @@ const Notificaciones = () => {
           tipo: 'success'
         }
       ];
-      
+     
       // Simulamos un retraso de red
       setTimeout(() => {
         setNotificaciones(notificacionesEjemplo);
@@ -93,7 +91,7 @@ const Notificaciones = () => {
     const fecha = new Date(fechaString);
     const ahora = new Date();
     const diferencia = ahora - fecha;
-    
+   
     // Menos de 1 hora
     if (diferencia < 3600000) {
       const minutos = Math.floor(diferencia / 60000);
@@ -136,16 +134,16 @@ const Notificaciones = () => {
       <div className="notificaciones-header">
         <Text strong>Notificaciones</Text>
         {notificacionesNoLeidas > 0 && (
-          <Button 
-            type="link" 
-            size="small" 
+          <Button
+            type="link"
+            size="small"
             onClick={marcarTodasComoLeidas}
           >
             Marcar todas como leídas
           </Button>
         )}
       </div>
-      
+     
       <div className="notificaciones-content">
         {loading ? (
           <div className="loading-container">
@@ -153,9 +151,9 @@ const Notificaciones = () => {
             <Text>Cargando notificaciones...</Text>
           </div>
         ) : notificaciones.length === 0 ? (
-          <Empty 
-            description="No tienes notificaciones" 
-            image={Empty.PRESENTED_IMAGE_SIMPLE} 
+          <Empty
+            description="No tienes notificaciones"
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
           />
         ) : (
           <List
@@ -165,17 +163,17 @@ const Notificaciones = () => {
                 className={`notificacion-item ${!item.leida ? 'no-leida' : ''}`}
                 style={getNotificacionStyle(item.tipo)}
                 actions={[
-                  <Button 
-                    type="text" 
-                    size="small" 
-                    icon={<CheckOutlined />} 
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<CheckOutlined />}
                     onClick={() => marcarComoLeida(item.id)}
                     disabled={item.leida}
                   />,
-                  <Button 
-                    type="text" 
-                    size="small" 
-                    icon={<DeleteOutlined />} 
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<DeleteOutlined />}
                     onClick={() => eliminarNotificacion(item.id)}
                   />
                 ]}
@@ -198,18 +196,18 @@ const Notificaciones = () => {
   );
 
   return (
-    <Dropdown 
-      overlay={menu} 
-      trigger={['click']} 
+    <Dropdown
+      overlay={menu}
+      trigger={['click']}
       open={open}
       onOpenChange={setOpen}
       placement="bottomRight"
       arrow
     >
       <Badge count={notificacionesNoLeidas} overflowCount={9}>
-        <Button 
-          type="text" 
-          icon={<BellOutlined />} 
+        <Button
+          type="text"
+          icon={<BellOutlined />}
           className="notificaciones-button"
         />
       </Badge>
