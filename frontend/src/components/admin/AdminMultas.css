@@ -48,3 +48,13 @@
     margin-top: 8px;
   }
 }
+.multa-detail .ant-card {
+  margin-bottom: 16px;
+}
+
+.descripcion-box {
+  background-color: #f5f5f5;
+  padding: 12px;
+  border-radius: 4px;
+  white-space: pre-wrap;
+}
