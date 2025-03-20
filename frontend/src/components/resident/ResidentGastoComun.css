@@ -1,3 +1,55 @@
+/* Estilos del layout principal (del dashboard) */
+.resident-layout {
+  min-height: 100vh;
+}
+
+.resident-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  background: #001529;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.welcome-text {
+  color: white;
+  margin-right: 15px;
+}
+
+.resident-sider {
+  background: #fff;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.09);
+  z-index: 10;
+}
+
+.resident-content {
+  background: #fff;
+  padding: 24px;
+  margin: 0;
+  min-height: 280px;
+}
+
+.menu-toggle-button {
+  font-size: 18px;
+}
+
+/* Estilos específicos de gastos comunes (mantenidos del código original) */
 .gasto-comun-container {
   padding: 24px;
   background: #fff;
@@ -100,21 +152,41 @@
   border-color: #40a9ff;
 }
 
+/* Media queries para responsividad */
 @media (max-width: 768px) {
+  .resident-header {
+    flex-wrap: wrap;
+    padding: 10px;
+  }
+ 
+  .header-right {
+    margin-top: 10px;
+  }
+
   .gasto-comun-container {
     padding: 16px;
   }
-  
+ 
   .stats-row .ant-col {
     margin-bottom: 16px;
   }
-  
+ 
   .ant-table {
     font-size: 12px;
   }
-  
+ 
   .ant-btn {
     font-size: 12px;
     padding: 0 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-text {
+    display: none;
+  }
+ 
+  .header-right {
+    justify-content: flex-end;
   }
 }

@@ -98,3 +98,139 @@
     padding: 8px 4px;
   }
 }
+
+
+/* Estilos del layout principal (del dashboard) */
+.resident-layout {
+  min-height: 100vh;
+}
+
+.resident-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  background: #001529;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.welcome-text {
+  color: white;
+  margin-right: 15px;
+}
+
+.resident-sider {
+  background: #fff;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.09);
+  z-index: 10;
+}
+
+.resident-content {
+  background: #fff;
+  padding: 24px;
+  margin: 0;
+  min-height: 280px;
+}
+
+.menu-toggle-button {
+  font-size: 18px;
+}
+
+/* Estilos específicos de multas (mantenidos del código original) */
+.multas-container {
+  padding: 24px;
+  background: #fff;
+  min-height: 280px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 0;
+}
+
+.loading-container .ant-spin {
+  margin-bottom: 16px;
+}
+
+.stats-row {
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-5px);
+}
+
+.multas-table {
+  margin-top: 16px;
+}
+
+/* Media queries mantenidas del código original */
+@media (max-width: 768px) {
+  .resident-header {
+    flex-wrap: wrap;
+    padding: 10px;
+  }
+ 
+  .header-right {
+    margin-top: 10px;
+  }
+ 
+  .stats-row .ant-col {
+    margin-bottom: 16px;
+  }
+ 
+  .ant-table {
+    font-size: 14px;
+  }
+ 
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    padding: 12px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-text {
+    display: none;
+  }
+ 
+  .header-right {
+    justify-content: flex-end;
+  }
+ 
+  .resident-multas-container {
+    padding: 16px;
+  }
+ 
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    padding: 8px 4px;
+  }
+}

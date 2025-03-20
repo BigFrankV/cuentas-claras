@@ -149,4 +149,4 @@ const ResidentDashboard = () => {
   );
 };
 
-export default ResidentDashboard;
+export default ResidentDashboard; 

@@ -1,20 +1,94 @@
+/* Estilos del layout principal */
+.admin-layout {
+  min-height: 100vh;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  background: #001529;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.welcome-text {
+  color: white;
+  margin-right: 15px;
+}
+
+.admin-sider {
+  background: #fff;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.09);
+  z-index: 10;
+}
+
+.admin-content {
+  background: #fff;
+  padding: 24px;
+  margin: 0;
+  min-height: 280px;
+}
+
+.menu-toggle-button {
+  font-size: 18px;
+}
+
+/* Estilos específicos de la página */
 .admin-gastocomun-container {
-  padding: 20px;
+  padding: 24px;
+  background: #fff;
+  min-height: 280px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  gap: 16px;
+}
+
+.alerta-vencidos {
+  margin-bottom: 24px;
 }
 
 .stats-row {
   margin-bottom: 24px;
 }
 
-.stats-row .ant-card {
+.stat-card {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
   transition: all 0.3s;
 }
 
-.stats-row .ant-card:hover {
+.stat-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   transform: translateY(-2px);
+}
+
+.stat-card .ant-statistic-title {
+  font-weight: 500;
+  color: #262626;
 }
 
 .table-actions {
@@ -27,24 +101,111 @@
   margin-left: 8px;
 }
 
-.ant-table-wrapper {
+.gastos-table {
   background: white;
   border-radius: 8px;
   padding: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
 }
 
+.ant-table-thead > tr > th {
+  background: #e6f7ff;
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.ant-table-tbody > tr:hover {
+  background: #f5f5f5;
+}
+
+.row-vencido {
+  background-color: #fff1f0;
+}
+
+.row-vencido:hover {
+  background-color: #ffccc7 !important;
+}
+
+.texto-vencido {
+  color: #ff4d4f;
+  font-weight: 500;
+}
+
+.ant-divider {
+  margin: 24px 0;
+}
+
+.ant-divider-inner-text {
+  font-weight: 500;
+  color: #1890ff;
+}
+
+.ant-tag-volcano {
+  color: #d4380d;
+  background: #fff2e8;
+  border-color: #ffbb96;
+}
+
+.ant-tag-green {
+  color: #52c41a;
+  background: #f6ffed;
+  border-color: #b7eb8f;
+}
+
+.ant-btn-primary {
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+.ant-btn-primary:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+/* Media queries para responsividad */
 @media (max-width: 768px) {
+  .admin-header {
+    flex-wrap: wrap;
+    padding: 10px;
+  }
+ 
+  .header-right {
+    margin-top: 10px;
+  }
+
+  .admin-gastocomun-container {
+    padding: 16px;
+  }
+ 
   .stats-row .ant-col {
     margin-bottom: 16px;
   }
-  
+ 
   .table-actions {
     flex-direction: column;
   }
-  
+ 
   .create-button {
     margin-left: 0;
     margin-top: 8px;
+  }
+  
+  .ant-table {
+    font-size: 12px;
+  }
+ 
+  .ant-btn {
+    font-size: 12px;
+    padding: 0 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-text {
+    display: none;
+  }
+ 
+  .header-right {
+    justify-content: flex-end;
   }
 }
