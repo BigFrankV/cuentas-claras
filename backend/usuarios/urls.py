@@ -4,7 +4,8 @@ from .views import (
     UsuarioListView,
     UsuarioDetailView,
     PerfilUsuarioView,
-    cambiar_password
+    cambiar_password,
+    estadisticas_usuarios
 )
 
 urlpatterns = [
@@ -13,4 +14,5 @@ urlpatterns = [
     path('perfil/', PerfilUsuarioView.as_view(), name='perfil-usuario'),
     path('<int:pk>/', UsuarioDetailView.as_view(), name='detalle-usuario'),
     path('cambiar-password/', cambiar_password, name='cambiar-password'),
+    path('estadisticas/', estadisticas_usuarios, name='estadisticas-usuarios'), 
 ]

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Row, Col, Card, Statistic, Divider } from 'antd';
+import { Typography, Row, Col, Card, Statistic, Divider, message, Spin } from 'antd';
 import { DollarOutlined, UserOutlined, WarningOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import './AdminEstadisticas.css';
@@ -39,15 +39,14 @@ const AdminEstadisticas = () => {
     try {
       setLoading(true);
       
+      // Usar los endpoints específicos de estadísticas para cada módulo
+      
       // Obtener estadísticas de usuarios
-      const usuariosResponse = await axios.get('http://localhost:8000/api/usuarios/', {
+      const usuariosResponse = await axios.get('http://localhost:8000/api/usuarios/estadisticas/', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });
-      
-      const admins = usuariosResponse.data.filter(usuario => usuario.rol === 'admin');
-      const residentes = usuariosResponse.data.filter(usuario => usuario.rol === 'residente');
       
       // Obtener estadísticas de gastos comunes
       const gastosComunesResponse = await axios.get('http://localhost:8000/api/gastocomun/estadisticas/', {
@@ -57,24 +56,17 @@ const AdminEstadisticas = () => {
       });
       
       // Obtener estadísticas de multas
-      const multasResponse = await axios.get('http://localhost:8000/api/multas/', {
+      const multasResponse = await axios.get('http://localhost:8000/api/multas/estadisticas/', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });
       
-      const multasPendientes = multasResponse.data.filter(multa => multa.estado === 'pendiente');
-      const multasPagadas = multasResponse.data.filter(multa => multa.estado === 'pagada');
-      const multasAnuladas = multasResponse.data.filter(multa => multa.estado === 'anulada');
-      
-      const montoPendienteMultas = multasPendientes.reduce((total, multa) => total + parseFloat(multa.precio), 0);
-      const montoPagadoMultas = multasPagadas.reduce((total, multa) => total + parseFloat(multa.precio), 0);
-      
       setEstadisticas({
         usuarios: {
-          total: usuariosResponse.data.length,
-          admins: admins.length,
-          residentes: residentes.length
+          total: usuariosResponse.data.total_usuarios,
+          admins: usuariosResponse.data.total_admins,
+          residentes: usuariosResponse.data.total_residentes
         },
         gastoComun: {
           total: gastosComunesResponse.data.total_gastos,
@@ -84,20 +76,40 @@ const AdminEstadisticas = () => {
           montoPagado: gastosComunesResponse.data.monto_pagado
         },
         multas: {
-          total: multasResponse.data.length,
-          pendientes: multasPendientes.length,
-          pagadas: multasPagadas.length,
-          anuladas: multasAnuladas.length,
-          montoPendiente: montoPendienteMultas,
-          montoPagado: montoPagadoMultas
+          total: multasResponse.data.total_multas,
+          pendientes: multasResponse.data.total_pendientes,
+          pagadas: multasResponse.data.total_pagadas,
+          anuladas: multasResponse.data.total_anuladas,
+          montoPendiente: multasResponse.data.monto_pendiente,
+          montoPagado: multasResponse.data.monto_pagado
         }
       });
     } catch (error) {
       console.error('Error fetching estadísticas:', error);
+      message.error('Error al cargar las estadísticas. Por favor intenta nuevamente.');
     } finally {
       setLoading(false);
     }
   };
+
+  // Función para formatear montos con separador de miles
+  const formatMonto = (monto) => {
+    if (!monto && monto !== 0) return '0';
+    return parseFloat(monto).toLocaleString('es-CL');
+  };
+
+  // Componente de carga
+  if (loading) {
+    return (
+      <div className="admin-estadisticas-container">
+        <Title level={2}>Estadísticas Generales</Title>
+        <div style={{ textAlign: 'center', margin: '50px 0' }}>
+          <Spin size="large" />
+          <p style={{ marginTop: 20 }}>Cargando estadísticas...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-estadisticas-container">
@@ -112,7 +124,6 @@ const AdminEstadisticas = () => {
                 title="Total Usuarios"
                 value={estadisticas.usuarios.total}
                 prefix={<UserOutlined />}
-                loading={loading}
               />
             </Card>
           </Col>
@@ -123,7 +134,6 @@ const AdminEstadisticas = () => {
                 value={estadisticas.usuarios.admins}
                 prefix={<UserOutlined />}
                 valueStyle={{ color: '#722ed1' }}
-                loading={loading}
               />
             </Card>
           </Col>
@@ -134,7 +144,6 @@ const AdminEstadisticas = () => {
                 value={estadisticas.usuarios.residentes}
                 prefix={<UserOutlined />}
                 valueStyle={{ color: '#13c2c2' }}
-                loading={loading}
               />
             </Card>
           </Col>
@@ -152,7 +161,6 @@ const AdminEstadisticas = () => {
                 title="Total Gastos"
                 value={estadisticas.gastoComun.total}
                 prefix={<DollarOutlined />}
-                loading={loading}
               />
             </Card>
           </Col>
@@ -163,7 +171,6 @@ const AdminEstadisticas = () => {
                 value={estadisticas.gastoComun.pendientes}
                 prefix={<WarningOutlined />}
                 valueStyle={{ color: '#cf1322' }}
-                loading={loading}
               />
             </Card>
           </Col>
@@ -174,7 +181,6 @@ const AdminEstadisticas = () => {
                 value={estadisticas.gastoComun.pagados}
                 prefix={<CheckCircleOutlined />}
                 valueStyle={{ color: '#3f8600' }}
-                loading={loading}
               />
             </Card>
           </Col>
@@ -182,13 +188,10 @@ const AdminEstadisticas = () => {
             <Card className="stat-card">
               <Statistic
                 title="Monto Pendiente"
-                value={estadisticas.gastoComun.montoPendiente}
-                precision={0}
+                value={formatMonto(estadisticas.gastoComun.montoPendiente)}
                 prefix={<DollarOutlined />}
                 suffix="$"
                 valueStyle={{ color: '#cf1322' }}
-                loading={loading}
-                formatter={value => value.toLocaleString('es-CL')}
               />
             </Card>
           </Col>
@@ -196,13 +199,10 @@ const AdminEstadisticas = () => {
             <Card className="stat-card">
               <Statistic
                 title="Monto Pagado"
-                value={estadisticas.gastoComun.montoPagado}
-                precision={0}
+                value={formatMonto(estadisticas.gastoComun.montoPagado)}
                 prefix={<DollarOutlined />}
                 suffix="$"
                 valueStyle={{ color: '#3f8600' }}
-                loading={loading}
-                formatter={value => value.toLocaleString('es-CL')}
               />
             </Card>
           </Col>
@@ -220,7 +220,6 @@ const AdminEstadisticas = () => {
                 title="Total Multas"
                 value={estadisticas.multas.total}
                 prefix={<WarningOutlined />}
-                loading={loading}
               />
             </Card>
           </Col>
@@ -231,7 +230,6 @@ const AdminEstadisticas = () => {
                 value={estadisticas.multas.pendientes}
                 prefix={<WarningOutlined />}
                 valueStyle={{ color: '#cf1322' }}
-                loading={loading}
               />
             </Card>
           </Col>
@@ -242,7 +240,6 @@ const AdminEstadisticas = () => {
                 value={estadisticas.multas.pagadas}
                 prefix={<CheckCircleOutlined />}
                 valueStyle={{ color: '#3f8600' }}
-                loading={loading}
               />
             </Card>
           </Col>
@@ -250,13 +247,10 @@ const AdminEstadisticas = () => {
             <Card className="stat-card">
               <Statistic
                 title="Monto Pendiente"
-                value={estadisticas.multas.montoPendiente}
-                precision={0}
+                value={formatMonto(estadisticas.multas.montoPendiente)}
                 prefix={<DollarOutlined />}
                 suffix="$"
                 valueStyle={{ color: '#cf1322' }}
-                loading={loading}
-                formatter={value => value.toLocaleString('es-CL')}
               />
             </Card>
           </Col>
@@ -264,13 +258,10 @@ const AdminEstadisticas = () => {
             <Card className="stat-card">
               <Statistic
                 title="Monto Pagado"
-                value={estadisticas.multas.montoPagado}
-                precision={0}
+                value={formatMonto(estadisticas.multas.montoPagado)}
                 prefix={<DollarOutlined />}
                 suffix="$"
                 valueStyle={{ color: '#3f8600' }}
-                loading={loading}
-                formatter={value => value.toLocaleString('es-CL')}
               />
             </Card>
           </Col>

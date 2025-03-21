@@ -9,7 +9,6 @@ from django.contrib.auth import authenticate
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-from rest_framework import status
 class RegistroUsuarioView(generics.CreateAPIView):
     """
     Vista para registrar nuevos usuarios.
@@ -91,14 +90,14 @@ def cambiar_password(request):
     # Verificar que se proporcionaron ambas contraseñas
     if not old_password or not new_password:
         return Response(
-            {"error": "Debes proporcionar la contraseña actual y la nueva contraseña"}, 
+            {"error": "Debes proporcionar la contraseña actual y la nueva contraseña"},
             status=status.HTTP_400_BAD_REQUEST
         )
     
     # Verificar que la contraseña actual sea correcta
     if not authenticate(username=user.username, password=old_password):
         return Response(
-            {"error": "La contraseña actual es incorrecta"}, 
+            {"error": "La contraseña actual es incorrecta"},
             status=status.HTTP_400_BAD_REQUEST
         )
     
@@ -107,3 +106,28 @@ def cambiar_password(request):
     user.save()
     
     return Response({"message": "Contraseña actualizada correctamente"})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def estadisticas_usuarios(request):
+    """
+    Vista para obtener estadísticas de usuarios.
+    Solo los administradores pueden ver estas estadísticas.
+    """
+    # Verificar si el usuario es administrador
+    if request.user.rol != 'admin':
+        return Response(
+            {"error": "Solo los administradores pueden ver estadísticas de usuarios"},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
+    # Obtener conteos de usuarios
+    total_usuarios = Usuario.objects.count()
+    total_admins = Usuario.objects.filter(rol='admin').count()
+    total_residentes = Usuario.objects.filter(rol='residente').count()
+    
+    return Response({
+        'total_usuarios': total_usuarios,
+        'total_admins': total_admins,
+        'total_residentes': total_residentes
+    })
