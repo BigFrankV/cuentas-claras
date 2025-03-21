@@ -88,10 +88,10 @@ const ResidentMultas = () => {
 
   const calcularEstadisticas = (datos) => {
     const pendientes = datos.filter(multa => multa.estado === 'pendiente');
-    const pagados = datos.filter(multa => multa.estado === 'pagado');
+    const pagados = datos.filter(multa => multa.estado === 'pagada');
    
-    const totalPendiente = pendientes.reduce((sum, multa) => sum + parseFloat(multa.monto), 0);
-    const totalPagado = pagados.reduce((sum, multa) => sum + parseFloat(multa.monto), 0);
+    const totalPendiente = pendientes.reduce((sum, multa) => sum + parseFloat(multa.precio || 0), 0);
+    const totalPagado = pagados.reduce((sum, multa) => sum + parseFloat(multa.precio || 0), 0);
      
     setEstadisticas({
       totalPendiente,
@@ -109,8 +109,8 @@ const ResidentMultas = () => {
         <div>
           <p>Está a punto de pagar la siguiente multa:</p>
           <p><strong>Motivo:</strong> {multa.motivo}</p>
-          <p><strong>Monto:</strong> ${parseFloat(multa.monto).toLocaleString('es-CL')}</p>
-          <p><strong>Fecha:</strong> {formatDate(multa.fecha)}</p>
+          <p><strong>Monto:</strong> ${parseFloat(multa.precio || 0).toLocaleString('es-CL')}</p>
+          <p><strong>Fecha:</strong> {formatDate(multa.fecha_creacion)}</p>
         </div>
       ),
       okText: 'Confirmar Pago',
@@ -134,7 +134,7 @@ const ResidentMultas = () => {
       // Actualizar la lista después del pago
       const updatedMultas = multas.map(multa => {
         if (multa.id === id) {
-          return { ...multa, estado: 'pagado', fecha_pago: new Date().toISOString() };
+          return { ...multa, estado: 'pagada', fecha_pago: new Date().toISOString() };
         }
         return multa;
       });
@@ -158,6 +158,7 @@ const ResidentMultas = () => {
   };
 
   const formatMonto = (monto) => {
+    if (!monto && monto !== 0) return '$0';
     return `$${parseFloat(monto).toLocaleString('es-CL')}`;
   };
 
@@ -306,17 +307,17 @@ const ResidentMultas = () => {
                     />
                     <Column
                       title="Monto"
-                      dataIndex="monto"
-                      key="monto"
+                      dataIndex="precio"
+                      key="precio"
                       render={(text) => formatMonto(text)}
-                      sorter={(a, b) => a.monto - b.monto}
+                      sorter={(a, b) => parseFloat(a.precio || 0) - parseFloat(b.precio || 0)}
                     />
                     <Column
                       title="Fecha"
-                      dataIndex="fecha"
-                      key="fecha"
+                      dataIndex="fecha_creacion"
+                      key="fecha_creacion"
                       render={(text) => formatDate(text)}
-                      sorter={(a, b) => new Date(a.fecha) - new Date(b.fecha)}
+                      sorter={(a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion)}
                     />
                     <Column
                       title="Estado"
@@ -329,7 +330,7 @@ const ResidentMultas = () => {
                       )}
                       filters={[
                         { text: 'Pendiente', value: 'pendiente' },
-                        { text: 'Pagado', value: 'pagado' },
+                        { text: 'Pagado', value: 'pagada' },
                       ]}
                       onFilter={(value, record) => record.estado === value}
                     />
