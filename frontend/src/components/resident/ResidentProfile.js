@@ -68,8 +68,9 @@ const ResidentProfile = () => {
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
+      // Modificado para usar el endpoint correcto con el ID del usuario
       const response = await axios.patch(
-        'http://localhost:8000/api/usuarios/actualizar-perfil/',
+        `http://localhost:8000/api/usuarios/${user.id}/`,
         values,
         {
           headers: {
@@ -83,7 +84,16 @@ const ResidentProfile = () => {
       setEditing(false);
     } catch (error) {
       console.error('Error actualizando perfil:', error);
-      message.error('Error al actualizar el perfil');
+      
+      // Mejorado el manejo de errores para mostrar mensajes más específicos
+      if (error.response) {
+        const errorMessage = error.response.data.detail || 
+                            (typeof error.response.data === 'object' && Object.values(error.response.data)[0]) || 
+                            'Error al actualizar el perfil';
+        message.error(errorMessage);
+      } else {
+        message.error('Error al actualizar el perfil. Revisa tu conexión a internet.');
+      }
     } finally {
       setLoading(false);
     }
@@ -109,7 +119,16 @@ const ResidentProfile = () => {
       passwordForm.resetFields();
     } catch (error) {
       console.error('Error cambiando contraseña:', error);
-      message.error('Error al cambiar la contraseña. Verifica que la contraseña actual sea correcta.');
+      
+      // Mejorado el manejo de errores para contraseñas
+      if (error.response && error.response.data) {
+        const errorMessage = error.response.data.detail || 
+                            (typeof error.response.data === 'object' && Object.values(error.response.data)[0]) || 
+                            'Error al cambiar la contraseña';
+        message.error(errorMessage);
+      } else {
+        message.error('Error al cambiar la contraseña. Verifica que la contraseña actual sea correcta.');
+      }
     } finally {
       setPasswordLoading(false);
     }
