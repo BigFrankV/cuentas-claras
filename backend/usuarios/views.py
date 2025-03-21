@@ -5,6 +5,11 @@ from rest_framework.views import APIView
 from .models import Usuario
 from .serializers import UsuarioSerializer, UsuarioUpdateSerializer
 
+from django.contrib.auth import authenticate
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+
+from rest_framework import status
 class RegistroUsuarioView(generics.CreateAPIView):
     """
     Vista para registrar nuevos usuarios.
@@ -72,3 +77,33 @@ class PerfilUsuarioView(APIView):
     def get(self, request):
         serializer = UsuarioSerializer(request.user)
         return Response(serializer.data)
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def cambiar_password(request):
+    """
+    Vista para cambiar la contraseña del usuario autenticado.
+    """
+    user = request.user
+    old_password = request.data.get('old_password')
+    new_password = request.data.get('new_password')
+    
+    # Verificar que se proporcionaron ambas contraseñas
+    if not old_password or not new_password:
+        return Response(
+            {"error": "Debes proporcionar la contraseña actual y la nueva contraseña"}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Verificar que la contraseña actual sea correcta
+    if not authenticate(username=user.username, password=old_password):
+        return Response(
+            {"error": "La contraseña actual es incorrecta"}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Establecer la nueva contraseña
+    user.set_password(new_password)
+    user.save()
+    
+    return Response({"message": "Contraseña actualizada correctamente"})
