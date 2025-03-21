@@ -1,20 +1,27 @@
 import React, { useState, useContext } from 'react';
 import { Layout, Menu, Typography, Button } from 'antd';
-import { 
-  HomeOutlined, 
-  DollarOutlined, 
-  WarningOutlined, 
+import {
+  HomeOutlined,
+  DollarOutlined,
+  WarningOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   BarChartOutlined,
   TeamOutlined,
-  SettingOutlined
+  SettingOutlined,
+  UserOutlined
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Routes, Route } from 'react-router-dom';
 import AuthContext from '../../context/AuthContext';
 import Notificaciones from '../common/Notificaciones';
 import AdminEstadisticas from './AdminEstadisticas';
+import AdminGastoComun from './AdminGastoComun';
+// Importa los demás componentes necesarios
+// import AdminMultas from './AdminMultas';
+// import AdminResidentes from './AdminResidentes';
+// import AdminConfiguracion from './AdminConfiguracion';
+// import AdminProfile from './AdminProfile';
 import './AdminDashboard.css';
 
 const { Header, Content, Sider } = Layout;
@@ -35,7 +42,7 @@ const AdminDashboard = () => {
         setCollapsed(false);
       }
     };
-    
+   
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -58,6 +65,7 @@ const AdminDashboard = () => {
     if (path === '/admin/multas') return '4';
     if (path === '/admin/residentes') return '5';
     if (path === '/admin/configuracion') return '6';
+    if (path === '/admin/profile') return '7';
     return '1';
   };
 
@@ -83,9 +91,9 @@ const AdminDashboard = () => {
           <span className="welcome-text">
             Administrador: {user?.first_name} {user?.last_name}
           </span>
-          <Button 
-            type="text" 
-            icon={<LogoutOutlined />} 
+          <Button
+            type="text"
+            icon={<LogoutOutlined />}
             onClick={handleLogout}
             style={{ color: 'white' }}
           >
@@ -94,8 +102,8 @@ const AdminDashboard = () => {
         </div>
       </Header>
       <Layout>
-        <Sider 
-          width={200} 
+        <Sider
+          width={200}
           className="admin-sider"
           collapsible
           collapsed={collapsed}
@@ -126,6 +134,9 @@ const AdminDashboard = () => {
             <Menu.Item key="6" icon={<SettingOutlined />} onClick={() => navigate('/admin/configuracion')}>
               Configuración
             </Menu.Item>
+            <Menu.Item key="7" icon={<UserOutlined />} onClick={() => navigate('/admin/profile')}>
+              Mi Perfil
+            </Menu.Item>
           </Menu>
         </Sider>
         <Layout style={{ padding: '0 24px 24px' }}>
@@ -150,7 +161,7 @@ const AdminDashboard = () => {
                         <Button type="primary" onClick={() => navigate('/admin/estadisticas')}>Ver Estadísticas</Button>
                       </div>
                     </div>
-                    
+                   
                     <div className="dashboard-card">
                       <DollarOutlined className="card-icon" />
                       <div className="card-content">
@@ -159,7 +170,7 @@ const AdminDashboard = () => {
                         <Button type="primary" onClick={() => navigate('/admin/gastocomun')}>Administrar</Button>
                       </div>
                     </div>
-                    
+                   
                     <div className="dashboard-card">
                       <WarningOutlined className="card-icon" />
                       <div className="card-content">
@@ -168,7 +179,7 @@ const AdminDashboard = () => {
                         <Button type="primary" onClick={() => navigate('/admin/multas')}>Administrar</Button>
                       </div>
                     </div>
-                    
+                   
                     <div className="dashboard-card">
                       <TeamOutlined className="card-icon" />
                       <div className="card-content">
@@ -177,7 +188,7 @@ const AdminDashboard = () => {
                         <Button type="primary" onClick={() => navigate('/admin/residentes')}>Administrar</Button>
                       </div>
                     </div>
-                    
+                   
                     <div className="dashboard-card">
                       <SettingOutlined className="card-icon" />
                       <div className="card-content">
@@ -189,8 +200,20 @@ const AdminDashboard = () => {
                   </div>
                 </>
               } />
-              <Route path="/estadisticas" element={<AdminEstadisticas />} />
-              {/* Aquí se pueden agregar más rutas para otros componentes de administrador */}
+              <Route path="estadisticas" element={<AdminEstadisticas />} />
+              <Route path="gastocomun" element={<AdminGastoComun />} />
+              
+              {/* Descomenta estas rutas cuando tengas los componentes implementados */}
+              {/* <Route path="multas" element={<AdminMultas />} /> */}
+              {/* <Route path="residentes" element={<AdminResidentes />} /> */}
+              {/* <Route path="configuracion" element={<AdminConfiguracion />} /> */}
+              {/* <Route path="profile" element={<AdminProfile />} /> */}
+              
+              {/* Mientras tanto, puedes usar componentes temporales para probar las rutas */}
+              <Route path="multas" element={<div><Title level={2}>Gestión de Multas</Title><p>Componente en desarrollo</p></div>} />
+              <Route path="residentes" element={<div><Title level={2}>Gestión de Residentes</Title><p>Componente en desarrollo</p></div>} />
+              <Route path="configuracion" element={<div><Title level={2}>Configuración</Title><p>Componente en desarrollo</p></div>} />
+              <Route path="profile" element={<div><Title level={2}>Mi Perfil</Title><p>Componente en desarrollo</p></div>} />
             </Routes>
           </Content>
         </Layout>

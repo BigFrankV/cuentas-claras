@@ -131,3 +131,19 @@ def estadisticas_usuarios(request):
         'total_admins': total_admins,
         'total_residentes': total_residentes
     })
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def listar_residentes(request):
+    """
+    Vista para listar todos los usuarios residentes.
+    Solo los administradores pueden ver esta lista.
+    """
+    if request.user.rol != 'admin':
+        return Response(
+            {"error": "Solo los administradores pueden ver la lista de residentes"},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
+    residentes = Usuario.objects.filter(rol='residente')
+    serializer = UsuarioSerializer(residentes, many=True)
+    return Response(serializer.data)
