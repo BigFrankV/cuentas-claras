@@ -18,7 +18,7 @@ import Notificaciones from '../common/Notificaciones';
 import AdminEstadisticas from './AdminEstadisticas';
 import AdminGastoComun from './AdminGastoComun';
 // Importa los demás componentes necesarios
-// import AdminMultas from './AdminMultas';
+import AdminMultas from './AdminMultas'; // Descomentado para usar el componente real
 // import AdminResidentes from './AdminResidentes';
 // import AdminConfiguracion from './AdminConfiguracion';
 // import AdminProfile from './AdminProfile';
@@ -202,15 +202,11 @@ const AdminDashboard = () => {
               } />
               <Route path="estadisticas" element={<AdminEstadisticas />} />
               <Route path="gastocomun" element={<AdminGastoComun />} />
+             
+              {/* Ahora usando el componente real de AdminMultas */}
+              <Route path="multas" element={<AdminMultas />} />
               
-              {/* Descomenta estas rutas cuando tengas los componentes implementados */}
-              {/* <Route path="multas" element={<AdminMultas />} /> */}
-              {/* <Route path="residentes" element={<AdminResidentes />} /> */}
-              {/* <Route path="configuracion" element={<AdminConfiguracion />} /> */}
-              {/* <Route path="profile" element={<AdminProfile />} /> */}
-              
-              {/* Mientras tanto, puedes usar componentes temporales para probar las rutas */}
-              <Route path="multas" element={<div><Title level={2}>Gestión de Multas</Title><p>Componente en desarrollo</p></div>} />
+              {/* Estos siguen como componentes temporales */}
               <Route path="residentes" element={<div><Title level={2}>Gestión de Residentes</Title><p>Componente en desarrollo</p></div>} />
               <Route path="configuracion" element={<div><Title level={2}>Configuración</Title><p>Componente en desarrollo</p></div>} />
               <Route path="profile" element={<div><Title level={2}>Mi Perfil</Title><p>Componente en desarrollo</p></div>} />
