@@ -5,39 +5,61 @@ import axios from 'axios';
 import AuthContext from '../../context/AuthContext';
 import './AdminRegistro.css';
 
+
 const { Title } = Typography;
 const { Option } = Select;
+
 
 const AdminRegistro = () => {
   const { user } = useContext(AuthContext);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
+
   const onFinish = async (values) => {
     try {
       setLoading(true);
+      
+      // Verificación de token (medida de seguridad de Register)
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        message.error('No tiene permisos para realizar esta acción. Por favor inicie sesión como administrador.');
+        setLoading(false);
+        return;
+      }
+      
       await axios.post('http://localhost:8000/api/usuarios/', {
         ...values,
       }, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          Authorization: `Bearer ${token}`,
         },
       });
-      
+     
       message.success('Usuario registrado exitosamente');
       form.resetFields();
     } catch (error) {
       console.error('Error registrando usuario:', error);
-      message.error('Error al registrar usuario. Por favor intente nuevamente.');
+      
+      // Manejo detallado de errores (medida de seguridad de Register)
+      if (error.response && error.response.data) {
+        const errorMessages = Object.entries(error.response.data)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(', ');
+        message.error(`Error al registrar usuario: ${errorMessages}`);
+      } else {
+        message.error('Error al registrar usuario. Por favor intente nuevamente.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
+
   return (
     <div className="admin-registro-container">
       <Title level={2}>Registrar Nuevo Usuario</Title>
-      
+     
       <Row justify="center">
         <Col xs={24} sm={20} md={16} lg={12}>
           <Card className="registro-card">
@@ -45,7 +67,7 @@ const AdminRegistro = () => {
               <UserAddOutlined className="registro-icon" />
               <h2>Formulario de Registro</h2>
             </div>
-            
+           
             <Form
               form={form}
               name="registro"
@@ -60,7 +82,7 @@ const AdminRegistro = () => {
               >
                 <Input placeholder="Ej: jperez" />
               </Form.Item>
-              
+             
               <Form.Item
                 name="password"
                 label="Contraseña"
@@ -69,6 +91,26 @@ const AdminRegistro = () => {
                 <Input.Password placeholder="Contraseña" />
               </Form.Item>
               
+              {/* Campo de confirmación de contraseña (medida de seguridad de Register) */}
+              <Form.Item
+                name="confirmPassword"
+                label="Confirmar Contraseña"
+                dependencies={['password']}
+                rules={[
+                  { required: true, message: 'Por favor confirme la contraseña' },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('password') === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(new Error('Las contraseñas no coinciden'));
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password placeholder="Confirmar Contraseña" />
+              </Form.Item>
+             
               <Form.Item
                 name="first_name"
                 label="Nombre"
@@ -76,7 +118,7 @@ const AdminRegistro = () => {
               >
                 <Input placeholder="Ej: Juan" />
               </Form.Item>
-              
+             
               <Form.Item
                 name="last_name"
                 label="Apellido"
@@ -84,7 +126,7 @@ const AdminRegistro = () => {
               >
                 <Input placeholder="Ej: Pérez" />
               </Form.Item>
-              
+             
               <Form.Item
                 name="email"
                 label="Email"
@@ -95,7 +137,7 @@ const AdminRegistro = () => {
               >
                 <Input placeholder="Ej: juan.perez@ejemplo.com" />
               </Form.Item>
-              
+             
               <Form.Item
                 name="rol"
                 label="Rol"
@@ -106,21 +148,21 @@ const AdminRegistro = () => {
                   <Option value="residente">Residente</Option>
                 </Select>
               </Form.Item>
-              
+             
               <Form.Item
                 name="telefono"
                 label="Teléfono"
               >
                 <Input placeholder="Ej: +56 9 1234 5678" />
               </Form.Item>
-              
+             
               <Form.Item
                 name="numero_residencia"
                 label="N° Residencia"
               >
                 <Input placeholder="Ej: 101" />
               </Form.Item>
-              
+             
               <Form.Item>
                 <Button type="primary" htmlType="submit" loading={loading} block>
                   Registrar Usuario
@@ -133,5 +175,6 @@ const AdminRegistro = () => {
     </div>
   );
 };
+
 
 export default AdminRegistro;

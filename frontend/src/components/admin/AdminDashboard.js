@@ -10,7 +10,8 @@ import {
   BarChartOutlined,
   TeamOutlined,
   SettingOutlined,
-  UserOutlined
+  UserOutlined,
+  QuestionCircleOutlined
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Routes, Route } from 'react-router-dom';
 import AuthContext from '../../context/AuthContext';
@@ -20,7 +21,12 @@ import AdminGastoComun from './AdminGastoComun';
 import AdminMultas from './AdminMultas';
 import AdminUsuarios from './AdminUsuarios';
 import AdminProfile from './AdminProfile';
+import AdminConfiguracion from './AdminConfiguracion';
+import AdminGuiaUso from './AdminGuiaUso';
 import './AdminDashboard.css';
+
+
+
 
 const { Header, Content, Sider } = Layout;
 const { Title } = Typography;
@@ -159,7 +165,7 @@ const AdminDashboard = () => {
                         <Button type="primary" onClick={() => navigate('/admin/estadisticas')}>Ver Estadísticas</Button>
                       </div>
                     </div>
-                   
+                    
                     <div className="dashboard-card">
                       <DollarOutlined className="card-icon" />
                       <div className="card-content">
@@ -168,7 +174,7 @@ const AdminDashboard = () => {
                         <Button type="primary" onClick={() => navigate('/admin/gastocomun')}>Administrar</Button>
                       </div>
                     </div>
-                   
+                    
                     <div className="dashboard-card">
                       <WarningOutlined className="card-icon" />
                       <div className="card-content">
@@ -177,7 +183,7 @@ const AdminDashboard = () => {
                         <Button type="primary" onClick={() => navigate('/admin/multas')}>Administrar</Button>
                       </div>
                     </div>
-                   
+                    
                     <div className="dashboard-card">
                       <TeamOutlined className="card-icon" />
                       <div className="card-content">
@@ -186,13 +192,23 @@ const AdminDashboard = () => {
                         <Button type="primary" onClick={() => navigate('/admin/residentes')}>Administrar</Button>
                       </div>
                     </div>
-                   
+                    
                     <div className="dashboard-card">
                       <SettingOutlined className="card-icon" />
                       <div className="card-content">
                         <h3>Configuración</h3>
                         <p>Configura los parámetros del sistema</p>
                         <Button type="primary" onClick={() => navigate('/admin/configuracion')}>Configurar</Button>
+                      </div>
+                    </div>
+                    
+                    {/* Nueva tarjeta para Guía de Uso */}
+                    <div className="dashboard-card">
+                      <QuestionCircleOutlined className="card-icon" />
+                      <div className="card-content">
+                        <h3>Guía de Uso</h3>
+                        <p>Consulta la documentación y ayuda del sistema</p>
+                        <Button type="primary" onClick={() => navigate('/admin/guia-uso')}>Ver Guía</Button>
                       </div>
                     </div>
                   </div>
@@ -202,7 +218,9 @@ const AdminDashboard = () => {
               <Route path="gastocomun" element={<AdminGastoComun />} />
               <Route path="multas" element={<AdminMultas />} />
               <Route path="residentes" element={<AdminUsuarios />} />
-              <Route path="configuracion" element={<div><Title level={2}>Configuración</Title><p>Componente en desarrollo</p></div>} />
+              <Route path="configuracion" element={<AdminConfiguracion />} />
+              {/* Nueva ruta para Guía de Uso */}
+              <Route path="guia-uso" element={<AdminGuiaUso />} />
               <Route path="profile" element={<AdminProfile />} />
             </Routes>
           </Content>
