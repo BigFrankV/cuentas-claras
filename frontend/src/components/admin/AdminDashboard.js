@@ -25,9 +25,6 @@ import AdminConfiguracion from './AdminConfiguracion';
 import AdminGuiaUso from './AdminGuiaUso';
 import './AdminDashboard.css';
 
-
-
-
 const { Header, Content, Sider } = Layout;
 const { Title } = Typography;
 
@@ -70,6 +67,7 @@ const AdminDashboard = () => {
     if (path === '/admin/residentes') return '5';
     if (path === '/admin/configuracion') return '6';
     if (path === '/admin/profile') return '7';
+    if (path === '/admin/guia-uso') return '8';
     return '1';
   };
 
@@ -91,10 +89,13 @@ const AdminDashboard = () => {
           </div>
         </div>
         <div className="header-right">
-          <Notificaciones />
+          {/* Componente de notificaciones con isAdmin=true */}
+          <Notificaciones isAdmin={true} />
+          
           <span className="welcome-text">
             Administrador: {user?.first_name} {user?.last_name}
           </span>
+
           <Button
             type="text"
             icon={<LogoutOutlined />}
@@ -118,6 +119,7 @@ const AdminDashboard = () => {
           <Menu
             mode="inline"
             defaultSelectedKeys={[getSelectedKey()]}
+            selectedKeys={[getSelectedKey()]}
             style={{ height: '100%', borderRight: 0 }}
           >
             <Menu.Item key="1" icon={<HomeOutlined />} onClick={() => navigate('/admin')}>
@@ -140,6 +142,9 @@ const AdminDashboard = () => {
             </Menu.Item>
             <Menu.Item key="7" icon={<UserOutlined />} onClick={() => navigate('/admin/profile')}>
               Mi Perfil
+            </Menu.Item>
+            <Menu.Item key="8" icon={<QuestionCircleOutlined />} onClick={() => navigate('/admin/guia-uso')}>
+              Guía de Uso
             </Menu.Item>
           </Menu>
         </Sider>
@@ -165,7 +170,7 @@ const AdminDashboard = () => {
                         <Button type="primary" onClick={() => navigate('/admin/estadisticas')}>Ver Estadísticas</Button>
                       </div>
                     </div>
-                    
+                   
                     <div className="dashboard-card">
                       <DollarOutlined className="card-icon" />
                       <div className="card-content">
@@ -174,7 +179,7 @@ const AdminDashboard = () => {
                         <Button type="primary" onClick={() => navigate('/admin/gastocomun')}>Administrar</Button>
                       </div>
                     </div>
-                    
+                   
                     <div className="dashboard-card">
                       <WarningOutlined className="card-icon" />
                       <div className="card-content">
@@ -183,7 +188,7 @@ const AdminDashboard = () => {
                         <Button type="primary" onClick={() => navigate('/admin/multas')}>Administrar</Button>
                       </div>
                     </div>
-                    
+                   
                     <div className="dashboard-card">
                       <TeamOutlined className="card-icon" />
                       <div className="card-content">
@@ -192,7 +197,7 @@ const AdminDashboard = () => {
                         <Button type="primary" onClick={() => navigate('/admin/residentes')}>Administrar</Button>
                       </div>
                     </div>
-                    
+                   
                     <div className="dashboard-card">
                       <SettingOutlined className="card-icon" />
                       <div className="card-content">
@@ -201,8 +206,8 @@ const AdminDashboard = () => {
                         <Button type="primary" onClick={() => navigate('/admin/configuracion')}>Configurar</Button>
                       </div>
                     </div>
-                    
-                    {/* Nueva tarjeta para Guía de Uso */}
+                   
+                    {/* Tarjeta para Guía de Uso */}
                     <div className="dashboard-card">
                       <QuestionCircleOutlined className="card-icon" />
                       <div className="card-content">
@@ -219,7 +224,6 @@ const AdminDashboard = () => {
               <Route path="multas" element={<AdminMultas />} />
               <Route path="residentes" element={<AdminUsuarios />} />
               <Route path="configuracion" element={<AdminConfiguracion />} />
-              {/* Nueva ruta para Guía de Uso */}
               <Route path="guia-uso" element={<AdminGuiaUso />} />
               <Route path="profile" element={<AdminProfile />} />
             </Routes>
