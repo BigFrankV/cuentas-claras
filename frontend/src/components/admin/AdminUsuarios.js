@@ -49,22 +49,29 @@ const AdminUsuarios = () => {
     }
   };
 
-  const fetchUsuarios = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(`http://localhost:8000/api/usuarios/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      });
-      setUsuarios(response.data);
-    } catch (error) {
-      console.error('Error fetching usuarios:', error);
-      message.error('Error al cargar la lista de usuarios');
-    } finally {
-      setLoading(false);
+const fetchUsuarios = async () => {
+  try {
+    setLoading(true);
+    // Cambiado a la ruta correcta según las URLs definidas en tu backend
+    const response = await axios.get(`http://localhost:8000/api/usuarios/lista/`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    });
+    setUsuarios(response.data);
+  } catch (error) {
+    console.error('Error fetching usuarios:', error);
+    // Mejorado el manejo de errores para facilitar la depuración
+    if (error.response) {
+      console.log('Status:', error.response.status);
+      console.log('Data:', error.response.data);
     }
-  };
+    message.error('Error al cargar la lista de usuarios');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleCreateUsuario = () => {
     setEditMode(false);
