@@ -1,0 +1,65 @@
+/* Estilos específicos del perfil */
+.profile-container {
+    padding: 24px;
+    background: #fff;
+    min-height: 280px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  }
+  
+  .profile-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+    margin-bottom: 20px;
+    transition: all 0.3s;
+  }
+  
+  .profile-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+  
+  .profile-card .ant-card-head {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 16px 24px;
+    background-color: #f0f5ff;
+  }
+  
+  .profile-card .ant-card-head-title {
+    font-weight: 600;
+    color: #1890ff;
+  }
+  
+  .profile-card .ant-card-body {
+    padding: 24px;
+  }
+  
+  .profile-card p {
+    margin-bottom: 12px;
+    line-height: 1.6;
+  }
+  
+  .profile-card p:last-child {
+    margin-bottom: 0;
+  }
+  
+  .profile-card strong {
+    margin-right: 8px;
+    color: #262626;
+  }
+  
+  /* Media queries */
+  @media (max-width: 768px) {
+    .profile-container {
+      padding: 16px;
+    }
+    
+    .profile-card {
+      margin-bottom: 16px;
+    }
+    
+    .ant-col {
+      margin-bottom: 16px;
+    }
+  }
+  
