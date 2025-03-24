@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Layout, Menu, Typography, Button } from 'antd';
 import {
   HomeOutlined,
@@ -17,11 +17,9 @@ import AuthContext from '../../context/AuthContext';
 import Notificaciones from '../common/Notificaciones';
 import AdminEstadisticas from './AdminEstadisticas';
 import AdminGastoComun from './AdminGastoComun';
-// Importa los demás componentes necesarios
-import AdminMultas from './AdminMultas'; // Descomentado para usar el componente real
-// import AdminResidentes from './AdminResidentes';
-// import AdminConfiguracion from './AdminConfiguracion';
-// import AdminProfile from './AdminProfile';
+import AdminMultas from './AdminMultas';
+import AdminUsuarios from './AdminUsuarios';
+import AdminProfile from './AdminProfile';
 import './AdminDashboard.css';
 
 const { Header, Content, Sider } = Layout;
@@ -35,7 +33,7 @@ const AdminDashboard = () => {
   const [mobileView, setMobileView] = useState(window.innerWidth < 768);
 
   // Detectar cambios en el tamaño de la ventana
-  React.useEffect(() => {
+  useEffect(() => {
     const handleResize = () => {
       setMobileView(window.innerWidth < 768);
       if (window.innerWidth >= 768) {
@@ -202,14 +200,10 @@ const AdminDashboard = () => {
               } />
               <Route path="estadisticas" element={<AdminEstadisticas />} />
               <Route path="gastocomun" element={<AdminGastoComun />} />
-             
-              {/* Ahora usando el componente real de AdminMultas */}
               <Route path="multas" element={<AdminMultas />} />
-              
-              {/* Estos siguen como componentes temporales */}
-              <Route path="residentes" element={<div><Title level={2}>Gestión de Residentes</Title><p>Componente en desarrollo</p></div>} />
+              <Route path="residentes" element={<AdminUsuarios />} />
               <Route path="configuracion" element={<div><Title level={2}>Configuración</Title><p>Componente en desarrollo</p></div>} />
-              <Route path="profile" element={<div><Title level={2}>Mi Perfil</Title><p>Componente en desarrollo</p></div>} />
+              <Route path="profile" element={<AdminProfile />} />
             </Routes>
           </Content>
         </Layout>

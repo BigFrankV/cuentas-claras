@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Typography, Button, Tag, Card, Statistic, Row, Col, Divider, Modal, Form, Input, Select, InputNumber, DatePicker, Layout, Menu, Spin, Space, Alert, message } from 'antd';
+import { Table, Typography, Button, Tag, Card, Statistic, Row, Col, Divider, Modal, Form, Input, Select, InputNumber, DatePicker, Spin, Space, Alert, message } from 'antd';
 import {
   DollarOutlined,
   PlusOutlined,
@@ -13,12 +13,15 @@ import locale from 'antd/es/date-picker/locale/es_ES';
 import moment from 'moment';
 import 'moment/locale/es';
 
+
 moment.locale('es');
 
+
 const { Column } = Table;
-const { Title, Text } = Typography;
+const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
+
 
 const AdminGastoComun = () => {
   const [gastos, setGastos] = useState([]);
@@ -35,12 +38,15 @@ const AdminGastoComun = () => {
     montoPagado: 0
   });
   const [errorMessage, setErrorMessage] = useState(null);
+  const [submitting, setSubmitting] = useState(false); // Nuevo estado para controlar el envío del formulario
+
 
   useEffect(() => {
     fetchGastos();
     fetchResidentes();
     fetchEstadisticas();
   }, []);
+
 
   const fetchGastos = async () => {
     try {
@@ -61,6 +67,7 @@ const AdminGastoComun = () => {
     }
   };
 
+
   const fetchEstadisticas = async () => {
     try {
       const response = await axios.get(`http://localhost:8000/api/gastocomun/estadisticas/`, {
@@ -68,7 +75,7 @@ const AdminGastoComun = () => {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });
-      
+     
       setEstadisticas({
         totalGastos: response.data.total_gastos,
         gastosPendientes: response.data.total_pendientes,
@@ -81,6 +88,7 @@ const AdminGastoComun = () => {
       message.error('Error al cargar las estadísticas de gastos comunes');
     }
   };
+
 
   const fetchResidentes = async () => {
     try {
@@ -103,6 +111,7 @@ const AdminGastoComun = () => {
     }
   };
 
+
   const handleCreateGasto = () => {
     form.resetFields();
     // Establecer fecha de vencimiento predeterminada (30 días desde hoy)
@@ -112,35 +121,105 @@ const AdminGastoComun = () => {
     setModalVisible(true);
   };
 
+
   const handleModalCancel = () => {
     setModalVisible(false);
   };
 
+
   const handleModalSubmit = async () => {
     try {
+      setSubmitting(true);
       const values = await form.validateFields();
-      
-      await axios.post('http://localhost:8000/api/gastocomun/', {
-        residente: values.residente,
-        concepto: values.concepto,
-        descripcion: values.descripcion,
-        monto: values.monto,
-        fecha_vencimiento: values.fecha_vencimiento.format('YYYY-MM-DD')
-      }, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      });
-      
+     
+      // 1. Convertir ID de residente a número
+      const residenteId = parseInt(values.residente);
+      if (isNaN(residenteId) || residenteId <= 0) {
+        throw new Error('ID de residente no válido');
+      }
+     
+      // 2. Convertir monto a string decimal adecuado para Django
+      let montoNumerico;
+      if (typeof values.monto === 'number') {
+        // Si es número, convertir directamente a string
+        montoNumerico = values.monto.toString();
+      } else if (typeof values.monto === 'string') {
+        // Si es string (con formato), limpiar y convertir a número
+        const montoLimpio = values.monto.replace(/[^\d.-]/g, '');
+        const montoFloat = parseFloat(montoLimpio);
+        if (isNaN(montoFloat)) {
+          throw new Error('El monto debe ser un número válido');
+        }
+        montoNumerico = montoFloat.toString();
+      } else {
+        throw new Error('El monto debe ser un número válido');
+      }
+     
+      // 3. Formato de fecha YYYY-MM-DD
+      const fechaObj = values.fecha_vencimiento;
+      if (!fechaObj || !fechaObj.isValid()) {
+        throw new Error('La fecha de vencimiento no es válida');
+      }
+      const fechaFormateada = fechaObj.format('YYYY-MM-DD');
+     
+      // Objeto de datos exactamente como lo espera el backend
+      const datos = {
+        residente: residenteId,
+        concepto: values.concepto.trim(),
+        descripcion: values.descripcion.trim(),
+        monto: montoNumerico,
+        fecha_vencimiento: fechaFormateada
+        // estado, fecha_emision y fecha_pago se manejan automáticamente en el backend
+      };
+     
+      console.log('Datos exactos para enviar al backend:', datos);
+     
+      const response = await axios.post(
+        'http://localhost:8000/api/gastocomun/',
+        datos,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+     
+      console.log('Respuesta exitosa:', response.data);
       message.success('Gasto común creado exitosamente');
       setModalVisible(false);
-      fetchGastos(); // Recargar la lista de gastos
-      fetchEstadisticas(); // Actualizar estadísticas
+      form.resetFields();
+      fetchGastos();
+      fetchEstadisticas();
     } catch (error) {
-      console.error('Error creating gasto común:', error);
-      message.error('Error al crear el gasto común');
+      console.error('Error completo:', error);
+     
+      let mensajeError = 'Error al crear el gasto común';
+     
+      if (error.message && !error.response) {
+        mensajeError = error.message;
+      } else if (error.response) {
+        console.log('Status:', error.response.status);
+        console.log('Headers:', error.response.headers);
+        console.log('Data:', error.response.data);
+       
+        if (typeof error.response.data === 'object') {
+          mensajeError = JSON.stringify(error.response.data);
+        } else if (typeof error.response.data === 'string') {
+          mensajeError = 'Error en el servidor. Contacta al administrador.';
+        }
+      }
+     
+      message.error(mensajeError);
+    } finally {
+      setSubmitting(false);
     }
   };
+
+
+
+
+
 
   const formatDate = (dateString) => {
     if (!dateString) return 'No disponible';
@@ -148,32 +227,35 @@ const AdminGastoComun = () => {
     return new Date(dateString).toLocaleDateString('es-ES', options);
   };
 
+
   const formatMonto = (monto) => {
     if (!monto && monto !== 0) return '$0';
     return `$${parseFloat(monto).toLocaleString('es-CL')}`;
   };
+
 
   // Verificar si hay gastos vencidos
   const gastosVencidos = gastos.filter(gasto =>
     gasto.estado === 'pendiente' && new Date(gasto.fecha_vencimiento) < new Date()
   );
 
+
   return (
     <div className="admin-gastocomun-container">
       <Title level={2}>Gestión de Gastos Comunes</Title>
-      
+     
       {errorMessage && (
-        <Alert 
-          message="Error" 
-          description={errorMessage} 
-          type="error" 
-          showIcon 
-          closable 
+        <Alert
+          message="Error"
+          description={errorMessage}
+          type="error"
+          showIcon
+          closable
           style={{ marginBottom: 16 }}
           onClose={() => setErrorMessage(null)}
         />
       )}
-      
+     
       {loading ? (
         <div className="loading-container" style={{ textAlign: 'center', margin: '50px 0' }}>
           <Spin size="large" />
@@ -191,7 +273,7 @@ const AdminGastoComun = () => {
               style={{ marginBottom: 16 }}
             />
           )}
-          
+         
           <Row gutter={[16, 16]} className="stats-row">
             <Col xs={24} sm={12} md={6}>
               <Card className="stat-card">
@@ -234,7 +316,7 @@ const AdminGastoComun = () => {
               </Card>
             </Col>
           </Row>
-          
+         
           <div className="table-actions" style={{ marginTop: 16, marginBottom: 16 }}>
             <Button
               type="primary"
@@ -245,7 +327,7 @@ const AdminGastoComun = () => {
               Crear Nuevo Gasto Común
             </Button>
           </div>
-          
+         
           <Divider orientation="left">
             <Space>
               <FilterOutlined />
@@ -253,7 +335,7 @@ const AdminGastoComun = () => {
               Listado de Gastos Comunes
             </Space>
           </Divider>
-          
+         
           <Table
             dataSource={gastos}
             loading={loading}
@@ -301,7 +383,7 @@ const AdminGastoComun = () => {
               render={(text) => formatMonto(text)}
               sorter={(a, b) => parseFloat(a.monto) - parseFloat(b.monto)}
             />
-            <Column
+                        <Column
               title="Estado"
               dataIndex="estado"
               render={(estado) => (
@@ -314,121 +396,128 @@ const AdminGastoComun = () => {
                 { text: 'Pagado', value: 'pagado' },
               ]}
               onFilter={(value, record) => record.estado === value}
-            />
-            <Column
-              title="Fecha Emisión"
-              dataIndex="fecha_emision"
-              render={(text) => formatDate(text)}
-              sorter={(a, b) => new Date(a.fecha_emision) - new Date(b.fecha_emision)}
-            />
-            <Column
-              title="Fecha Vencimiento"
-              dataIndex="fecha_vencimiento"
-              render={(text, record) => {
-                const fechaVencimiento = new Date(text);
-                const hoy = new Date();
-                const esVencido = record.estado === 'pendiente' && fechaVencimiento < hoy;
-                
-                return (
-                  <Space>
-                    {esVencido && <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
-                    <span className={esVencido ? 'texto-vencido' : ''}>
-                      {formatDate(text)}
-                    </span>
-                  </Space>
-                );
-              }}
-              sorter={(a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento)}
-            />
-            <Column
-              title="Fecha Pago"
-              dataIndex="fecha_pago"
-              render={(text) => text ? formatDate(text) : '-'}
-            />
-            {/* Se podrían agregar acciones como Editar, Eliminar, Ver detalles, etc. */}
-          </Table>
-        </>
-      )}
-      
-      <Modal
-        title="Crear Nuevo Gasto Común"
-        visible={modalVisible}
-        onCancel={handleModalCancel}
-        footer={[
-          <Button key="cancel" onClick={handleModalCancel}>
-            Cancelar
-          </Button>,
-          <Button key="submit" type="primary" onClick={handleModalSubmit}>
-            Crear
-          </Button>,
-        ]}
-        >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            name="residente"
-            label="Residente"
-            rules={[{ required: true, message: 'Por favor seleccione un residente' }]}
-          >
-            <Select 
-              placeholder="Seleccione un residente" 
-              loading={loadingResidentes}
-              notFoundContent={loadingResidentes ? <Spin size="small" /> : 'No hay residentes disponibles'}
+              />
+              <Column
+                title="Fecha Emisión"
+                dataIndex="fecha_emision"
+                render={(text) => formatDate(text)}
+                sorter={(a, b) => new Date(a.fecha_emision) - new Date(b.fecha_emision)}
+              />
+              <Column
+                title="Fecha Vencimiento"
+                dataIndex="fecha_vencimiento"
+                render={(text, record) => {
+                  const fechaVencimiento = new Date(text);
+                  const hoy = new Date();
+                  const esVencido = record.estado === 'pendiente' && fechaVencimiento < hoy;
+                 
+                  return (
+                    <Space>
+                      {esVencido && <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
+                      <span className={esVencido ? 'texto-vencido' : ''}>
+                        {formatDate(text)}
+                      </span>
+                    </Space>
+                  );
+                }}
+                sorter={(a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento)}
+              />
+              <Column
+                title="Fecha Pago"
+                dataIndex="fecha_pago"
+                render={(text) => text ? formatDate(text) : '-'}
+              />
+              {/* Se podrían agregar acciones como Editar, Eliminar, Ver detalles, etc. */}
+            </Table>
+          </>
+        )}
+       
+        <Modal
+          title="Crear Nuevo Gasto Común"
+          open={modalVisible}
+          onCancel={handleModalCancel}
+          footer={[
+            <Button key="cancel" onClick={handleModalCancel}>
+              Cancelar
+            </Button>,
+            <Button
+              key="submit"
+              type="primary"
+              onClick={handleModalSubmit}
+              loading={submitting}
+              disabled={submitting}
             >
-              {residentes.map(residente => (
-                <Option key={residente.id} value={residente.id}>
-                  {residente.first_name} {residente.last_name} ({residente.username})
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-          
-          <Form.Item
-            name="concepto"
-            label="Concepto"
-            rules={[{ required: true, message: 'Por favor ingrese el concepto del gasto' }]}
-          >
-            <Input placeholder="Ej: Gasto común mes de Marzo" />
-          </Form.Item>
-          
-          <Form.Item
-            name="descripcion"
-            label="Descripción"
-            rules={[{ required: true, message: 'Por favor ingrese una descripción' }]}
-          >
-            <TextArea rows={4} placeholder="Detalles del gasto común" />
-          </Form.Item>
-          
-          <Form.Item
-            name="monto"
-            label="Monto"
-            rules={[{ required: true, message: 'Por favor ingrese el monto del gasto' }]}
-          >
-            <InputNumber
-              min={1}
-              step={1000}
-              style={{ width: '100%' }}
-              formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
-              parser={value => value.replace(/\$\s?|(\.|,)/g, '')}
-              placeholder="Monto en pesos"
-            />
-          </Form.Item>
-          
-          <Form.Item
-            name="fecha_vencimiento"
-            label="Fecha de Vencimiento"
-            rules={[{ required: true, message: 'Por favor seleccione la fecha de vencimiento' }]}
-          >
-            <DatePicker
-              style={{ width: '100%' }}
-              format="DD/MM/YYYY"
-              locale={locale}
-              placeholder="Seleccione fecha"
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
-  );
-};
-
-export default AdminGastoComun;
+              Crear
+            </Button>,
+          ]}
+        >
+          <Form form={form} layout="vertical">
+            <Form.Item
+              name="residente"
+              label="Residente"
+              rules={[{ required: true, message: 'Por favor seleccione un residente' }]}
+            >
+              <Select
+                placeholder="Seleccione un residente"
+                loading={loadingResidentes}
+                notFoundContent={loadingResidentes ? <Spin size="small" /> : 'No hay residentes disponibles'}
+              >
+                {residentes.map(residente => (
+                  <Option key={residente.id} value={residente.id}>
+                    {residente.first_name} {residente.last_name} ({residente.username})
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+           
+            <Form.Item
+              name="concepto"
+              label="Concepto"
+              rules={[{ required: true, message: 'Por favor ingrese el concepto del gasto' }]}
+            >
+              <Input placeholder="Ej: Gasto común mes de Marzo" />
+            </Form.Item>
+           
+            <Form.Item
+              name="descripcion"
+              label="Descripción"
+              rules={[{ required: true, message: 'Por favor ingrese una descripción' }]}
+            >
+              <TextArea rows={4} placeholder="Detalles del gasto común" />
+            </Form.Item>
+           
+            <Form.Item
+              name="monto"
+              label="Monto"
+              rules={[{ required: true, message: 'Por favor ingrese el monto del gasto' }]}
+            >
+              <InputNumber
+                min={1}
+                step={1000}
+                style={{ width: '100%' }}
+                formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
+                parser={value => value.replace(/\$\s?|(\.|,)/g, '')}
+                placeholder="Monto en pesos"
+              />
+            </Form.Item>
+           
+            <Form.Item
+              name="fecha_vencimiento"
+              label="Fecha de Vencimiento"
+              rules={[{ required: true, message: 'Por favor seleccione la fecha de vencimiento' }]}
+            >
+              <DatePicker
+                style={{ width: '100%' }}
+                format="DD/MM/YYYY"
+                locale={locale}
+                placeholder="Seleccione fecha"
+              />
+            </Form.Item>
+          </Form>
+        </Modal>
+      </div>
+    );
+  };
+  
+  export default AdminGastoComun;
+  

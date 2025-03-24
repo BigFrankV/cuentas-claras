@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Table, Typography, Button, Tag, Card, Statistic, Row, Col, Modal, Form, Input, Select, Divider } from 'antd';
-import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Table, Typography, Button, Tag, Card, Statistic, Row, Col, Modal, Form, Input, Select, message } from 'antd';
+
+import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import AuthContext from '../../context/AuthContext';
 import './AdminUsuarios.css';
 
-const { Column } = Table; 
+const { Column } = Table;
 const { Title } = Typography;
 const { Option } = Select;
+const { confirm } = Modal;
 
 const AdminUsuarios = () => {
   const { user } = useContext(AuthContext);
@@ -25,7 +27,27 @@ const AdminUsuarios = () => {
 
   useEffect(() => {
     fetchUsuarios();
+    fetchEstadisticas();
   }, []);
+
+  const fetchEstadisticas = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/usuarios/estadisticas/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+      
+      setEstadisticas({
+        totalUsuarios: response.data.total_usuarios,
+        totalAdmins: response.data.total_admins,
+        totalResidentes: response.data.total_residentes
+      });
+    } catch (error) {
+      console.error('Error fetching estadísticas:', error);
+      message.error('Error al cargar las estadísticas de usuarios');
+    }
+  };
 
   const fetchUsuarios = async () => {
     try {
@@ -36,18 +58,9 @@ const AdminUsuarios = () => {
         },
       });
       setUsuarios(response.data);
-      
-      // Calcular estadísticas
-      const admins = response.data.filter(usuario => usuario.rol === 'admin');
-      const residentes = response.data.filter(usuario => usuario.rol === 'residente');
-      
-      setEstadisticas({
-        totalUsuarios: response.data.length,
-        totalAdmins: admins.length,
-        totalResidentes: residentes.length
-      });
     } catch (error) {
       console.error('Error fetching usuarios:', error);
+      message.error('Error al cargar la lista de usuarios');
     } finally {
       setLoading(false);
     }
@@ -75,6 +88,20 @@ const AdminUsuarios = () => {
     setModalVisible(true);
   };
 
+  const confirmDelete = (id) => {
+    confirm({
+      title: '¿Estás seguro de eliminar este usuario?',
+      icon: <ExclamationCircleOutlined />,
+      content: 'Esta acción no se puede deshacer',
+      okText: 'Sí, eliminar',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        handleDeleteUsuario(id);
+      }
+    });
+  };
+
   const handleDeleteUsuario = async (id) => {
     try {
       await axios.delete(`http://localhost:8000/api/usuarios/${id}/`, {
@@ -82,9 +109,12 @@ const AdminUsuarios = () => {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });
-      fetchUsuarios(); // Recargar la lista de usuarios
+      message.success('Usuario eliminado exitosamente');
+      fetchUsuarios();
+      fetchEstadisticas();
     } catch (error) {
       console.error('Error eliminando usuario:', error);
+      message.error('Error al eliminar el usuario');
     }
   };
 
@@ -98,29 +128,46 @@ const AdminUsuarios = () => {
       
       if (editMode && selectedUser) {
         // Actualizar usuario existente
-        await axios.put(`http://localhost:8000/api/usuarios/${selectedUser.id}/`, {
-          ...values,
-        }, {
+        await axios.put(`http://localhost:8000/api/usuarios/${selectedUser.id}/`, values, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
         });
+        message.success('Usuario actualizado exitosamente');
       } else {
         // Crear nuevo usuario
-        await axios.post('http://localhost:8000/api/usuarios/', {
+        await axios.post('http://localhost:8000/api/usuarios/registro/', {
           ...values,
-          password: values.password
+          password2: values.password  // Django requiere password2 para la validación
         }, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
         });
+        message.success('Usuario creado exitosamente');
       }
       
       setModalVisible(false);
-      fetchUsuarios(); // Recargar la lista de usuarios
+      fetchUsuarios();
+      fetchEstadisticas();
     } catch (error) {
       console.error('Error saving usuario:', error);
+      if (error.response && error.response.data) {
+        const errorData = error.response.data;
+        let errorMessage = 'Error al guardar el usuario';
+        
+        // Mostrar errores específicos si están disponibles
+        if (typeof errorData === 'object') {
+          const errors = Object.entries(errorData)
+            .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
+            .join('; ');
+          errorMessage = `Error: ${errors}`;
+        }
+        
+        message.error(errorMessage);
+      } else {
+        message.error('Error al guardar el usuario');
+      }
     }
   };
 
@@ -162,9 +209,9 @@ const AdminUsuarios = () => {
       </Row>
       
       <div className="table-actions">
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />} 
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
           onClick={handleCreateUsuario}
           className="create-button"
         >
@@ -174,14 +221,14 @@ const AdminUsuarios = () => {
       
       <Table dataSource={usuarios} loading={loading} rowKey="id">
         <Column title="Username" dataIndex="username" />
-        <Column 
-          title="Nombre" 
+        <Column
+          title="Nombre"
           render={(text, record) => `${record.first_name} ${record.last_name}`}
         />
         <Column title="Email" dataIndex="email" />
-        <Column 
-          title="Rol" 
-          dataIndex="rol" 
+        <Column
+          title="Rol"
+          dataIndex="rol"
           render={(rol) => (
             <Tag color={rol === 'admin' ? 'purple' : 'blue'}>
               {rol === 'admin' ? 'Administrador' : 'Residente'}
@@ -199,17 +246,17 @@ const AdminUsuarios = () => {
           title="Acciones"
           render={(text, record) => (
             <div>
-              <Button 
-                type="primary" 
-                icon={<EditOutlined />} 
+              <Button
+                type="primary"
+                icon={<EditOutlined />}
                 onClick={() => handleEditUsuario(record)}
                 style={{ marginRight: '8px' }}
               />
-              <Button 
-                type="primary" 
+              <Button
+                type="primary"
                 danger
                 icon={<DeleteOutlined />}
-                onClick={() => handleDeleteUsuario(record.id)}
+                onClick={() => confirmDelete(record.id)}
                 disabled={record.id === user?.id} // No permitir eliminar al usuario actual
               />
             </div>
@@ -219,7 +266,7 @@ const AdminUsuarios = () => {
       
       <Modal
         title={editMode ? "Editar Usuario" : "Crear Nuevo Usuario"}
-        visible={modalVisible}
+        open={modalVisible}
         onCancel={handleModalCancel}
         footer={[
           <Button key="cancel" onClick={handleModalCancel}>

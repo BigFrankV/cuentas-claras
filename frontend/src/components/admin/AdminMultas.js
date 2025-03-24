@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Typography, Button, Tag, Card, Statistic, Row, Col, Divider, Modal, Form, Input, Select, InputNumber, DatePicker, Spin, Space, Alert, message } from 'antd';
+import { Table, Typography, Button, Tag, Card, Statistic, Row, Col, Divider, Modal, Form, Input, Select, InputNumber, Spin, Space, Alert, message } from 'antd';
 import {
   DollarOutlined,
   PlusOutlined,
@@ -10,16 +10,18 @@ import {
   StopOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
-import locale from 'antd/es/date-picker/locale/es_ES';
 import moment from 'moment';
 import 'moment/locale/es';
 
+
 moment.locale('es');
 
+
 const { Column } = Table;
-const { Title, Text } = Typography;
+const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
+
 
 const AdminMultas = () => {
   const [multas, setMultas] = useState([]);
@@ -38,11 +40,13 @@ const AdminMultas = () => {
   });
   const [errorMessage, setErrorMessage] = useState(null);
 
+
   useEffect(() => {
     fetchMultas();
     fetchResidentes();
     fetchEstadisticas();
   }, []);
+
 
   const fetchMultas = async () => {
     try {
@@ -62,7 +66,6 @@ const AdminMultas = () => {
       setLoading(false);
     }
   };
-
   const fetchEstadisticas = async () => {
     try {
       const response = await axios.get(`http://localhost:8000/api/multas/estadisticas/`, {
@@ -70,7 +73,7 @@ const AdminMultas = () => {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });
-      
+     
       setEstadisticas({
         totalMultas: response.data.total_multas,
         multasPendientes: response.data.total_pendientes,
@@ -84,6 +87,7 @@ const AdminMultas = () => {
       message.error('Error al cargar las estadísticas de multas');
     }
   };
+
 
   const fetchResidentes = async () => {
     try {
@@ -104,19 +108,22 @@ const AdminMultas = () => {
     }
   };
 
+
   const handleCreateMulta = () => {
     form.resetFields();
     setModalVisible(true);
   };
 
+
   const handleModalCancel = () => {
     setModalVisible(false);
   };
 
+
   const handleModalSubmit = async () => {
     try {
       const values = await form.validateFields();
-      
+     
       await axios.post('http://localhost:8000/api/multas/', {
         residente: values.residente,
         motivo: values.motivo,
@@ -127,7 +134,7 @@ const AdminMultas = () => {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });
-      
+     
       message.success('Multa creada exitosamente');
       setModalVisible(false);
       fetchMultas(); // Recargar la lista de multas
@@ -138,6 +145,7 @@ const AdminMultas = () => {
     }
   };
 
+
   const handleAnularMulta = async (id) => {
     try {
       await axios.post(`http://localhost:8000/api/multas/${id}/anular/`, {}, {
@@ -145,7 +153,7 @@ const AdminMultas = () => {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });
-      
+     
       message.success('Multa anulada exitosamente');
       fetchMultas(); // Recargar la lista de multas
       fetchEstadisticas(); // Actualizar estadísticas
@@ -154,6 +162,7 @@ const AdminMultas = () => {
       message.error('Error al anular la multa');
     }
   };
+
 
   const confirmAnularMulta = (multa) => {
     Modal.confirm({
@@ -169,32 +178,35 @@ const AdminMultas = () => {
     });
   };
 
+
   const formatDate = (dateString) => {
     if (!dateString) return 'No disponible';
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('es-ES', options);
   };
 
+
   const formatMonto = (monto) => {
     if (!monto && monto !== 0) return '$0';
     return `$${parseFloat(monto).toLocaleString('es-CL')}`;
   };
+
   return (
     <div className="admin-multas-container">
       <Title level={2}>Gestión de Multas</Title>
-      
+     
       {errorMessage && (
-        <Alert 
-          message="Error" 
-          description={errorMessage} 
-          type="error" 
-          showIcon 
-          closable 
+        <Alert
+          message="Error"
+          description={errorMessage}
+          type="error"
+          showIcon
+          closable
           style={{ marginBottom: 16 }}
           onClose={() => setErrorMessage(null)}
         />
       )}
-      
+     
       {loading ? (
         <div className="loading-container" style={{ textAlign: 'center', margin: '50px 0' }}>
           <Spin size="large" />
@@ -244,7 +256,7 @@ const AdminMultas = () => {
               </Card>
             </Col>
           </Row>
-          
+         
           <div className="table-actions" style={{ marginTop: 16, marginBottom: 16 }}>
             <Button
               type="primary"
@@ -255,7 +267,7 @@ const AdminMultas = () => {
               Crear Nueva Multa
             </Button>
           </div>
-          
+         
           <Divider orientation="left">
             <Space>
               <FilterOutlined />
@@ -263,7 +275,7 @@ const AdminMultas = () => {
               Listado de Multas
             </Space>
           </Divider>
-          
+         
           <Table
             dataSource={multas}
             loading={loading}
@@ -342,8 +354,8 @@ const AdminMultas = () => {
               render={(_, record) => (
                 <Space>
                   {record.estado === 'pendiente' && (
-                    <Button 
-                      type="default" 
+                    <Button
+                      type="default"
                       danger
                       icon={<StopOutlined />}
                       onClick={() => confirmAnularMulta(record)}
@@ -357,7 +369,7 @@ const AdminMultas = () => {
           </Table>
         </>
       )}
-      
+     
       <Modal
         title="Crear Nueva Multa"
         visible={modalVisible}
@@ -377,8 +389,8 @@ const AdminMultas = () => {
             label="Residente"
             rules={[{ required: true, message: 'Por favor seleccione un residente' }]}
           >
-            <Select 
-              placeholder="Seleccione un residente" 
+            <Select
+              placeholder="Seleccione un residente"
               loading={loadingResidentes}
               notFoundContent={loadingResidentes ? <Spin size="small" /> : 'No hay residentes disponibles'}
             >
@@ -389,7 +401,7 @@ const AdminMultas = () => {
               ))}
             </Select>
           </Form.Item>
-          
+         
           <Form.Item
             name="motivo"
             label="Motivo"
@@ -397,7 +409,7 @@ const AdminMultas = () => {
           >
             <Input placeholder="Ej: Exceso de ruido" />
           </Form.Item>
-          
+         
           <Form.Item
             name="descripcion"
             label="Descripción"
@@ -405,7 +417,7 @@ const AdminMultas = () => {
           >
             <TextArea rows={4} placeholder="Detalles de la multa" />
           </Form.Item>
-          
+         
           <Form.Item
             name="precio"
             label="Monto"
@@ -427,3 +439,4 @@ const AdminMultas = () => {
 };
 
 export default AdminMultas;
+
