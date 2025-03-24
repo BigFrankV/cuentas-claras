@@ -1,6 +1,7 @@
 from django.db import models
 from usuarios.models import Usuario
 from django.utils import timezone
+from model_utils import FieldTracker
 
 # Create your models here.
 
@@ -23,7 +24,11 @@ class GastoComun(models.Model):
     fecha_emision = models.DateField(default=timezone.now)
     fecha_vencimiento = models.DateField()
     fecha_pago = models.DateTimeField(null=True, blank=True)
-    
+    tracker = FieldTracker(fields=['estado'])
+
+
+
+
     class Meta:
         ordering = ['-fecha_emision']
         verbose_name = 'Gasto Común'

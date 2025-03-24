@@ -1,5 +1,7 @@
 from django.db import models
 from usuarios.models import Usuario
+from model_utils import FieldTracker
+
 
 # Create your models here.
 
@@ -22,7 +24,8 @@ class Multa(models.Model):
     estado = models.CharField(max_length=10, choices=ESTADOS, default='pendiente')
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_pago = models.DateTimeField(null=True, blank=True)
-    
+    tracker = FieldTracker(fields=['estado'])
+
     class Meta:
         ordering = ['-fecha_creacion']
         verbose_name = 'Multa'

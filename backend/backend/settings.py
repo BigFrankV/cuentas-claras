@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'usuarios',
     'gastocomun',
     'multas',
+    'notificaciones',
 ]
 
 MIDDLEWARE = [
